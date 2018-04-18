@@ -18,7 +18,7 @@ This project uses the following modules:
 ## Sources of Data:
 The medal data is from Wikipedia, and the population data is scraped from Wikipedia too. As a result, all data is open-source.  
 
-##Example Output
+## Example Output
 
 The following output id based on the example data in <a href = "input.csv">input.csv. </a>
 
