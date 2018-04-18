@@ -16,6 +16,21 @@ medalCount = [] #Contains the medal count fot each country
 population = [] #Contains the population data for each country
 totRatio = [] #Contains the medal to population ratio for each country
 
+def findPop(countryN):
+    countryWiki = requests.get('http://en.wikipedia.org/wiki/' + countryN, params={'action': 'raw'})
+    countryWiki = countryWiki.text #The requests object at countryWiki is translated into plaintext and assigned back to countryWiki
+    for lines in countryWiki.splitlines(): #A loop is Initialised that iterates through each line of countryWiki
+        if "population_census" in lines: #If "population_census" is found in the string 'line'
+            line = lines.split("=") # We split line by '=' (i.e. population_census = 1,231,231 {})
+            line = line[1].split("{") # We split the second part of line by '{' (i.e. 1,231,231 {})
+            line = line[0].split('<') #We split the first part of line by '<' if such a character exists (i.e. 1,231,231 <ref>)
+            '''
+            We get the rid of the commas in the string in the first part of line and convert it to an int (like "1,231,231" ----> 1231231), before
+            returning it.
+            '''
+            return_val = int(line[0].replace(',', ''))
+            return return_val
+
 '''
 We are now loading in the .csv file containg the country names and the medal counts in the order <countryName><medalCount>. Each
 country has its own line in the file.
@@ -30,25 +45,7 @@ with open('input.csv') as inputFile: #Opens input.csv and assigns it to inputFil
         medalCount.append(int(row[1])) # Append to the end of medalCount the second element of row in type integer
 
 for x in range(len(countryName)): #Loop through each element of countryName
-    found = False #This variable exists as we want to get the first (latest) population data that is shown in the wikipedia page
-    '''
-    Using the requests module, download the webpage of the wikipedia entry. We get the url by concatenating the countryName at position x (index of loop)
-    to the end of part of the wikipedia url that all english pages share. We also set the get command to download the raw page. The raw page is then
-    assigned to the variable countryWiki.
-    '''
-    countryWiki = requests.get('http://en.wikipedia.org/wiki/' + countryName[x], params={'action': 'raw'})
-    countryWiki = countryWiki.text #The requests object at countryWiki is translated into plaintext and assigned back to countryWiki
-    for lines in countryWiki.splitlines(): #A loop is Initialised that iterates through each line of countryWiki
-        if "population_census" in lines and found == False: #If "population_census" is found in the string 'line' and we have not found a similar line
-            line = lines.split("=") # We split line by '=' (i.e. population_census = 1,231,231 {})
-            line = line[1].split("{") # We split the second part of line by '{' (i.e. 1,231,231 {})
-            line = line[0].split('<') #We split the first part of line by '<' if such a character exists (i.e. 1,231,231 <ref>)
-            '''
-            We get the rid of the commas in the string in the first part of line and convert it to an int (like "1,231,231" ----> 1231231), before
-            being appened onto the end of population.
-            '''
-            population.append(int(line[0].replace(',', '')))
-            found = True #We have found the latest population_census data so we can set found to True
+    population.append(findPop(countryName[x]))
 
 
 for x in range(len(countryName)): #We loop through countryName again
